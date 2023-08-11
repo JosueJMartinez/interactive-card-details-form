@@ -1,0 +1,45 @@
+.credit_card {
+	height: 154px;
+	width: 281px;
+	background-size: contain;
+	&_back {
+		position: absolute;
+		top: -87px;
+		left: -120px;
+		background-image: url('../images/bg-card-back.png');
+		.cvc {
+			position: relative;
+			bottom: -41%;
+			left: 80%;
+		}
+	}
+	&_front {
+		position: absolute;
+		top: 0;
+		left: -160px;
+		background-image: url('../images/bg-card-front.png');
+		.card {
+			&_number {
+				position: absolute;
+				bottom: 30%;
+				left: 5%;
+			}
+			&_logo {
+        width: 20%;
+        position: absolute;
+				bottom: 70%;
+				left: 5%;
+			}
+			&_name {
+        position: absolute;
+				bottom: 10%;
+				left: 5%;
+			}
+			&_expiration {
+        position: absolute;
+				bottom: 10%;
+				left: 75%;
+			}
+		}
+	}
+}

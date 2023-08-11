@@ -1,0 +1,26 @@
+// Required
+@import '~bootstrap/scss/functions';
+@import '~bootstrap/scss/variables';
+@import '~bootstrap/scss/variables-dark';
+@import '~bootstrap/scss/maps';
+@import '~bootstrap/scss/mixins';
+
+// Default variable overrides
+
+// $body-bg: hsl(229, 57%, 11%);
+
+$light: white;
+
+// // Optional Bootstrap components here
+@import '~bootstrap/scss/reboot';
+@import '~bootstrap/scss/type';
+@import '~bootstrap/scss/utilities';
+@import 'bootstrap';
+
+body {
+	// font-family: 'Roboto', sans-serif;
+	height: 100vh;
+	// background-image: url('../images/bg-main-mobile.png');
+	background-repeat: no-repeat;
+	// background-size: cover;
+}
