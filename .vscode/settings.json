@@ -1,5 +1,6 @@
 {
   "marquee.widgets.npm-stats.packageNames": [
     "interactive-card-details-form"
-  ]
+  ],
+  "editor.wordWrapColumn": 80
 }
