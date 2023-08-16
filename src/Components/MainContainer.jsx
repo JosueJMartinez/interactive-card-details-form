@@ -19,7 +19,7 @@ function MainContainer() {
 	};
 
 	return (
-		<div className={`container-fluid container-lg d-flex flex-column align-items-center justify-content-center vh-100 ${styles.mobile_background}`}>
+		<div className={`container-fluid container-sm d-flex flex-column align-items-center justify-content-center vh-100 ${styles.mobile_background}`}>
 			{' '}
 			<div className={styles.background_container}>
 				<div className={styles.card_holder}>

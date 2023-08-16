@@ -3,17 +3,22 @@ import { Form, Button, Col, InputGroup, Row } from 'react-bootstrap';
 
 export function CreditCardForm({ onCreditFormChange, creditFormData }) {
 	const { cardName, cardNumber, cardCvc, cardExpMonth, cardExpYear } = { ...creditFormData };
-	const [isValid, setIsValid] = useState(true);
+	const [isValid, setIsValid] = useState({
+		cardName: true,
+		cardNumber: true,
+		cardCvc: true,
+		cardExpMonth: true,
+		cardExpYear: true,
+	});
 
 	const handleFormInputChange = e => {
 		let { name, value } = e.target;
-		if (name === 'cardCvc') console.log(validateNumberString(value));
-
-		if (name === 'cardNumber') {
-			console.log('value', value);
-			seperateEveryFour(value);
+		if (name === 'cardNumber') value = formatCardNumber(value);
+		if (!isValid[name]) {
+			setIsValid(prevState => {
+				return { ...prevState, [name]: true };
+			});
 		}
-
 		const newData = {
 			...creditFormData,
 			[name]: value,
@@ -26,12 +31,81 @@ export function CreditCardForm({ onCreditFormChange, creditFormData }) {
 		return numberPattern.test(inputString);
 	};
 
-	const seperateEveryFour = input => {
-		console.log(input.match(/.{1,4}/g));
+	const formatCardNumber = value => {
+		let v = value.replace(/\s+/g, '');
+		let matches = v.match(/.{4,16}/g);
+		let match = (matches && matches[0]) || '';
+		let parts = [];
+		for (let i = 0, len = match.length; i < len; i += 4) {
+			parts.push(match.substring(i, i + 4));
+		}
+
+		if (parts.length) return parts.join(' ');
+		else return value;
+	};
+
+	const isNumberSpecificLen = (str, len) => {
+		const regexPattern = new RegExp(`^\\d{${len}}$`);
+		return regexPattern.test(str);
+	};
+
+	const handleSubmit = evt => {
+		evt.preventDefault();
+		if (!cardName) {
+			console.log('error on name');
+			setIsValid(prevState => {
+				return { ...prevState, cardName: false };
+			});
+		}
+		if (!isNumberSpecificLen(cardCvc, 3)) {
+			console.log('error CVC');
+			setIsValid(prevState => {
+				return { ...prevState, cardCvc: false };
+			});
+		}
+		if (!isNumberSpecificLen(cardExpMonth, 2)) {
+			console.log('error cardExpMonth');
+			setIsValid(prevState => {
+				return { ...prevState, cardExpMonth: false };
+			});
+		} else {
+			const testMonth = +cardExpMonth;
+			if (testMonth < 1 || testMonth > 12) {
+				console.log('error cardExpMonth not a valid month');
+				setIsValid(prevState => {
+					return { ...prevState, cardExpMonth: false };
+				});
+			}
+		}
+		if (!isNumberSpecificLen(cardExpYear, 2)) {
+			console.log('error cardExpYear');
+			setIsValid(prevState => {
+				return { ...prevState, cardExpYear: false };
+			});
+		} else {
+			const testYear = +cardExpYear;
+			if (testYear < 0 || testYear > 99) {
+				console.log('error cardExpYear not a valid month');
+				setIsValid(prevState => {
+					return { ...prevState, cardExpYear: false };
+				});
+			}
+		}
+		const cardNumberWithOutSpaces = cardNumber.replace(/\s/g, '');
+		if (!isNumberSpecificLen(cardNumberWithOutSpaces, 16)) {
+			console.log('error with card number');
+			setIsValid(prevState => {
+				return { ...prevState, cardNumber: false };
+			});
+		}
+
+		for (const key in isValid) {
+			console.log(`${key}: ${isValid[key]}`);
+		}
 	};
 
 	return (
-		<Form className='w-100'>
+		<Form className='w-100' onSubmit={handleSubmit}>
 			<Form.Group className='mb-3' controlId='cardName'>
 				<Form.Label>CARDHOLDER NAME</Form.Label>
 				<Form.Control
@@ -42,6 +116,7 @@ export function CreditCardForm({ onCreditFormChange, creditFormData }) {
 					value={cardName}
 					onChange={handleFormInputChange}
 				/>
+				{!isValid.cardName && <div>Error</div>}
 			</Form.Group>
 			<Form.Group className='mb-3' controlId='cardNumber'>
 				<Form.Label>CARD NUMBER</Form.Label>
@@ -54,41 +129,37 @@ export function CreditCardForm({ onCreditFormChange, creditFormData }) {
 					onChange={handleFormInputChange}
 					maxLength='19'
 				/>
+				{!isValid.cardNumber && <div>Error</div>}
 			</Form.Group>
-			{/* <Form.Group className='mb-3' controlId='formBasicCheckbox'>
-				<Form.Check type='checkbox' label='Check me out' />
-			</Form.Group> */}
 
 			<Row className='align-items-center mb-3'>
 				<fieldset className='my-1 col'>
 					<Row className='align-items-center'>
-						<Form.Label for='cardExpMonth'>EXP. DATE (MM/YY)</Form.Label>
+						<Form.Label htmlFor='cardExpMonth'>EXP. DATE (MM/YY)</Form.Label>
 						<Col className='my-1 px-1'>
 							<Form.Control
-								// id='cardExpMonth'
-								type='number'
+								id='cardExpMonth'
+								type='text'
 								placeholder='MM'
-								min='1'
-								max='12'
-								step='any'
+								maxLength='2'
 								name='cardExpMonth'
 								value={cardExpMonth}
 								onChange={handleFormInputChange}
 							/>
+							{!isValid.cardExpMonth && <div>Error</div>}
 						</Col>
 						<Col className='my-1 px-1'>
 							<InputGroup>
 								<Form.Control
-									// id='cardExpYear'
-									type='number'
+									id='cardExpYear'
+									type='text'
 									placeholder='YY'
-									min='1'
-									max='12'
-									step='any'
+									maxLength='2'
 									name='cardExpYear'
 									value={cardExpYear}
 									onChange={handleFormInputChange}
 								/>
+								{!isValid.cardExpYear && <div>Error</div>}
 							</InputGroup>
 						</Col>
 					</Row>
@@ -97,7 +168,7 @@ export function CreditCardForm({ onCreditFormChange, creditFormData }) {
 					<Form.Label htmlFor='cardCvc'>CVC</Form.Label>
 					<InputGroup>
 						<Form.Control
-							// id='cardCvc'
+							id='cardCvc'
 							type='text'
 							placeholder='e.g. 123'
 							maxLength='3'
@@ -105,6 +176,7 @@ export function CreditCardForm({ onCreditFormChange, creditFormData }) {
 							value={cardCvc}
 							onChange={handleFormInputChange}
 						/>
+						{!isValid.cardCvc && <div>Error</div>}
 					</InputGroup>
 				</Col>
 			</Row>

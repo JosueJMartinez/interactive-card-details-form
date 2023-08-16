@@ -4,19 +4,6 @@ import CreditCardIcon from '../images/card-logo.svg';
 export function FrontCreditCard({ cardInfo }) {
 	const { cardNumber, cardName, cardExpMonth, cardExpYear } = { ...cardInfo };
 
-	const formatCreditCardNumber = cardNumber => {
-		// let result = cardNumber.split(" ")
-		console.log(cardNumber);
-		console.log(typeof cardNumber);
-		// result = result.map((digits, idx) => (
-		// 	<span key={idx} className='pe-2'>
-		// 		{digits}
-		// 	</span>
-		// ));
-		// return result;
-		return cardNumber
-	};
-
 	return (
 		<div className={`${styles.credit_card_front} ${styles.credit_card}`}>
 			<img src={CreditCardIcon} alt='credit-card-logo' className={styles.card_logo} />
