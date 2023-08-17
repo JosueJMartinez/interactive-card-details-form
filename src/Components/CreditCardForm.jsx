@@ -5,16 +5,39 @@ export function CreditCardForm({ onCreditFormChange, creditFormData }) {
 	const { cardName, cardNumber, cardCvc, cardExpMonth, cardExpYear } = { ...creditFormData };
 	const [isValid, setIsValid] = useState({
 		cardName: true,
-		cardNumber: true,
-		cardCvc: true,
-		cardExpMonth: true,
-		cardExpYear: true,
+		cardNumber: { isEmpty: false, isFormatted: true },
+		cardCvc: { isEmpty: false, isFormatted: true },
+		cardExpMonth: { isEmpty: false, isFormatted: true },
+		cardExpYear: { isEmpty: false, isFormatted: true },
 	});
 
 	const handleFormInputChange = e => {
 		let { name, value } = e.target;
 		if (name === 'cardNumber') value = formatCardNumber(value);
-		if (!isValid[name]) {
+
+		if (name === 'cardExpYear' || name === 'cardExpMonth') {
+			if (value.length === 1) value = '0' + value;
+			else if (value.length === 3 && value[0] === '0') value = value.slice(1);
+			else value = value.slice(0, value.length - 1);
+		}
+
+		if (name === 'cardName') {
+			if (!isValid[name]) {
+				setIsValid(prevState => {
+					return { ...prevState, [name]: true };
+				});
+			}
+		} else if (
+			name === 'cardCvc' ||
+			name === 'cardNumber' ||
+			name === 'cardExpMonth' ||
+			name === 'cardExpYear'
+		)
+			setIsValid(prevState => ({
+				...prevState,
+				[name]: { ...prevState[name], isEmpty: false, isFormatted: true },
+			}));
+		else if (!isValid[name]) {
 			setIsValid(prevState => {
 				return { ...prevState, [name]: true };
 			});
@@ -24,11 +47,6 @@ export function CreditCardForm({ onCreditFormChange, creditFormData }) {
 			[name]: value,
 		};
 		onCreditFormChange(newData);
-	};
-
-	const validateNumberString = inputString => {
-		const numberPattern = /^[0-9]+$/;
-		return numberPattern.test(inputString);
 	};
 
 	const formatCardNumber = value => {
@@ -52,54 +70,78 @@ export function CreditCardForm({ onCreditFormChange, creditFormData }) {
 	const handleSubmit = evt => {
 		evt.preventDefault();
 		if (!cardName) {
-			console.log('error on name');
 			setIsValid(prevState => {
 				return { ...prevState, cardName: false };
 			});
 		}
-		if (!isNumberSpecificLen(cardCvc, 3)) {
-			console.log('error CVC');
-			setIsValid(prevState => {
-				return { ...prevState, cardCvc: false };
-			});
+
+		if (!cardCvc) {
+			setIsValid(prevState => ({
+				...prevState,
+				cardCvc: { ...prevState.cardCvc, isEmpty: true },
+			}));
+		} else if (!isNumberSpecificLen(cardCvc, 3)) {
+			setIsValid(prevState => ({
+				...prevState,
+				cardCvc: { ...prevState.cardCvc, isFormatted: false },
+			}));
 		}
-		if (!isNumberSpecificLen(cardExpMonth, 2)) {
-			console.log('error cardExpMonth');
-			setIsValid(prevState => {
-				return { ...prevState, cardExpMonth: false };
-			});
+
+		if (!cardExpMonth) {
+			setIsValid(prevState => ({
+				...prevState,
+				cardExpMonth: { ...prevState.cardExpMonth, isEmpty: true },
+			}));
+		} else if (!isNumberSpecificLen(cardExpMonth, 2)) {
+			setIsValid(prevState => ({
+				...prevState,
+				cardExpMonth: { ...prevState.cardExpMonth, isFormatted: false },
+			}));
 		} else {
 			const testMonth = +cardExpMonth;
 			if (testMonth < 1 || testMonth > 12) {
-				console.log('error cardExpMonth not a valid month');
-				setIsValid(prevState => {
-					return { ...prevState, cardExpMonth: false };
-				});
+				setIsValid(prevState => ({
+					...prevState,
+					cardExpMonth: { ...prevState.cardExpMonth, isFormatted: false },
+				}));
 			}
 		}
-		if (!isNumberSpecificLen(cardExpYear, 2)) {
-			console.log('error cardExpYear');
-			setIsValid(prevState => {
-				return { ...prevState, cardExpYear: false };
-			});
+		if (!cardExpYear) {
+			setIsValid(prevState => ({
+				...prevState,
+				cardExpYear: { ...prevState.cardExpYear, isEmpty: true },
+			}));
+		} else if (!isNumberSpecificLen(cardExpYear, 2)) {
+			setIsValid(prevState => ({
+				...prevState,
+				cardExpYear: { ...prevState.cardExpYear, isFormatted: false },
+			}));
 		} else {
 			const testYear = +cardExpYear;
 			if (testYear < 0 || testYear > 99) {
-				console.log('error cardExpYear not a valid month');
-				setIsValid(prevState => {
-					return { ...prevState, cardExpYear: false };
-				});
+				setIsValid(prevState => ({
+					...prevState,
+					cardExpYear: { ...prevState.cardExpYear, isFormatted: false },
+				}));
 			}
 		}
+
 		const cardNumberWithOutSpaces = cardNumber.replace(/\s/g, '');
-		if (!isNumberSpecificLen(cardNumberWithOutSpaces, 16)) {
-			console.log('error with card number');
-			setIsValid(prevState => {
-				return { ...prevState, cardNumber: false };
-			});
+
+		if (!cardNumberWithOutSpaces) {
+			setIsValid(prevState => ({
+				...prevState,
+				cardNumber: { ...prevState.cardNumber, isEmpty: true },
+			}));
+		} else if (!isNumberSpecificLen(cardNumberWithOutSpaces, 16)) {
+			setIsValid(prevState => ({
+				...prevState,
+				cardNumber: { ...prevState.cardNumber, isFormatted: false },
+			}));
 		}
 
 		for (const key in isValid) {
+			if (key === 'cardCvc') console.log(`${key}:`, isValid[key]);
 			console.log(`${key}: ${isValid[key]}`);
 		}
 	};
@@ -109,29 +151,33 @@ export function CreditCardForm({ onCreditFormChange, creditFormData }) {
 			<Form.Group className='mb-3' controlId='cardName'>
 				<Form.Label>CARDHOLDER NAME</Form.Label>
 				<Form.Control
-					// id='cardName'
 					type='text'
 					placeholder='e.g. Jane Appleseed'
 					name='cardName'
 					value={cardName}
 					onChange={handleFormInputChange}
+					isInvalid={!isValid.cardName}
 				/>
-				{!isValid.cardName && <div>Error</div>}
+				<Form.Control.Feedback type='invalid'>Name can't be blank</Form.Control.Feedback>
 			</Form.Group>
 			<Form.Group className='mb-3' controlId='cardNumber'>
 				<Form.Label>CARD NUMBER</Form.Label>
 				<Form.Control
-					// id='cardNumber'
 					type='text'
 					placeholder='e.g. 1234 5678 9123 0000'
 					name='cardNumber'
 					value={cardNumber}
 					onChange={handleFormInputChange}
 					maxLength='19'
+					isInvalid={isValid.cardNumber.isEmpty || !isValid.cardNumber.isFormatted}
 				/>
-				{!isValid.cardNumber && <div>Error</div>}
+				{isValid.cardNumber.isEmpty && (
+					<Form.Control.Feedback type='invalid'>Card number can't be blank</Form.Control.Feedback>
+				)}
+				{!isValid.cardNumber.isFormatted && (
+					<Form.Control.Feedback type='invalid'>Card number is not valid</Form.Control.Feedback>
+				)}
 			</Form.Group>
-
 			<Row className='align-items-center mb-3'>
 				<fieldset className='my-1 col'>
 					<Row className='align-items-center'>
@@ -141,12 +187,17 @@ export function CreditCardForm({ onCreditFormChange, creditFormData }) {
 								id='cardExpMonth'
 								type='text'
 								placeholder='MM'
-								maxLength='2'
 								name='cardExpMonth'
 								value={cardExpMonth}
 								onChange={handleFormInputChange}
+								isInvalid={isValid.cardExpMonth.isEmpty || !isValid.cardExpMonth.isFormatted}
 							/>
-							{!isValid.cardExpMonth && <div>Error</div>}
+							{isValid.cardExpMonth.isEmpty && (
+								<Form.Control.Feedback type='invalid'>Can't be blank</Form.Control.Feedback>
+							)}
+							{!isValid.cardExpMonth.isFormatted && (
+								<Form.Control.Feedback type='invalid'>Month is not valid</Form.Control.Feedback>
+							)}
 						</Col>
 						<Col className='my-1 px-1'>
 							<InputGroup>
@@ -154,12 +205,17 @@ export function CreditCardForm({ onCreditFormChange, creditFormData }) {
 									id='cardExpYear'
 									type='text'
 									placeholder='YY'
-									maxLength='2'
 									name='cardExpYear'
 									value={cardExpYear}
 									onChange={handleFormInputChange}
+									isInvalid={isValid.cardExpYear.isEmpty || !isValid.cardExpYear.isFormatted}
 								/>
-								{!isValid.cardExpYear && <div>Error</div>}
+								{isValid.cardExpYear.isEmpty && (
+									<Form.Control.Feedback type='invalid'>Can't be blank</Form.Control.Feedback>
+								)}
+								{!isValid.cardExpYear.isFormatted && (
+									<Form.Control.Feedback type='invalid'>Year is not valid</Form.Control.Feedback>
+								)}
 							</InputGroup>
 						</Col>
 					</Row>
@@ -175,8 +231,14 @@ export function CreditCardForm({ onCreditFormChange, creditFormData }) {
 							name='cardCvc'
 							value={cardCvc}
 							onChange={handleFormInputChange}
+							isInvalid={isValid.cardCvc.isEmpty || !isValid.cardCvc.isFormatted}
 						/>
-						{!isValid.cardCvc && <div>Error</div>}
+						{isValid.cardCvc.isEmpty && (
+							<Form.Control.Feedback type='invalid'>CVC can't be blank</Form.Control.Feedback>
+						)}
+						{!isValid.cardCvc.isFormatted && (
+							<Form.Control.Feedback type='invalid'>CVC is not valid</Form.Control.Feedback>
+						)}
 					</InputGroup>
 				</Col>
 			</Row>
