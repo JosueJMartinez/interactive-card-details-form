@@ -9,9 +9,11 @@
 		background-image: url('../images/bg-card-back.png');
 		.cvc {
 			position: relative;
-			bottom: -41%;
+			bottom: -44%;
 			left: 80%;
 			width: fit-content;
+			font-size: 12px;
+			color: white;
 		}
 	}
 	&_front {
@@ -23,23 +25,29 @@
 			&_number {
 				position: absolute;
 				bottom: 30%;
-				left: 5%;
+				left: 8%;
+				font-size: 18px;
+				color: white;
 			}
 			&_logo {
-        width: 20%;
-        position: absolute;
-				bottom: 70%;
-				left: 5%;
+				width: 20%;
+				position: absolute;
+				bottom: 67%;
+				left: 8%;
 			}
 			&_name {
-        position: absolute;
+				position: absolute;
 				bottom: 10%;
-				left: 5%;
+				left: 8%;
+				font-size: 12px;
+				color: white;
 			}
 			&_expiration {
-        position: absolute;
+				position: absolute;
 				bottom: 10%;
 				left: 75%;
+				font-size: 12px;
+				color: white;
 			}
 		}
 	}

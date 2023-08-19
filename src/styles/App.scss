@@ -2,6 +2,8 @@
 @import '~bootstrap/scss/functions';
 @import '~bootstrap/scss/variables';
 @import '~bootstrap/scss/variables-dark';
+
+$btn-primary-bg: #ff0000;
 @import '~bootstrap/scss/maps';
 @import '~bootstrap/scss/mixins';
 
@@ -17,10 +19,106 @@ $light: white;
 @import '~bootstrap/scss/utilities';
 @import 'bootstrap';
 
+* {
+	font-family: 'Space Grotesk', sans-serif;
+	color: hsl(278, 68%, 11%);
+	font-weight: 500;
+}
+
+:root {
+	--bs-btn-bg: rgb(28, 28, 56);
+}
+
+.btn-primary {
+	background-color: rgb(28, 28, 56); // Default background color
+	border-color: rgb(28, 28, 56); // Default border color
+
+	&:hover,
+	&:focus {
+		background-color: rgba(47, 47, 94, 1); // Lighten on hover/focus
+		border-color: rgba(47, 47, 94, 1); // Lighten border color
+	}
+
+	&:active {
+		background-color: rgba(9, 9, 18, 1) !important; // Darken on active
+		border-color: rgba(9, 9, 18, 1) !important; // Darken border color
+	}
+}
+
 body {
 	// font-family: 'Roboto', sans-serif;
 	height: 100vh;
 	// background-image: url('../images/bg-main-mobile.png');
 	background-repeat: no-repeat;
 	// background-size: cover;
+}
+
+// form overwrites
+
+.custom-form-control-wrapper {
+	position: relative; /* For positioning the pseudo-element */
+	// margin-bottom: 10px;
+	&::after {
+		content: '';
+		position: absolute;
+		top: -3px;
+		left: -3px;
+		right: -3px;
+		bottom: -3px;
+		border: 3px solid transparent;
+		border-radius: 14px;
+		z-index: -1;
+		background-image: linear-gradient(to right, hsl(249, 99%, 64%), hsl(278, 94%, 30%));
+		background-origin: border-box;
+		background-clip: content-box, border-box;
+		transition: border 0.3s;
+	}
+}
+
+.form-control {
+	border: 4px solid hsl(279, 6%, 55%); //transparent;
+	width: 100%;
+	padding: 14px;
+	border-radius: 10px; /* Adjust as needed */
+	transition: border 0.3s;
+
+	&:focus {
+		outline: none;
+		border-color: transparent;
+		box-shadow: none;
+	}
+	&.is-invalid {
+		background-image: none;
+		&:focus {
+			box-shadow: none;
+		}
+	}
+}
+.invalid-feedback {
+	position: absolute;
+	bottom: -20px;
+}
+
+.input {
+	&-month {
+		padding-right: calc(var(--bs-gutter-x) * 0.2);
+	}
+	&-year {
+		padding-left: calc(var(--bs-gutter-x) * 0.2);
+	}
+}
+.exp-row-wrapper {
+	margin-left: -6px;
+	position: relative;
+}
+.exp-wrapper {
+	width: 45%;
+	padding: 0;
+}
+.display-invalid {
+	display: block;
+	left: 0;
+	&-shift {
+		left: 105px;
+	}
 }

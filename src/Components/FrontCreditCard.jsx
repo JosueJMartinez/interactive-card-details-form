@@ -7,10 +7,10 @@ export function FrontCreditCard({ cardInfo }) {
 	return (
 		<div className={`${styles.credit_card_front} ${styles.credit_card}`}>
 			<img src={CreditCardIcon} alt='credit-card-logo' className={styles.card_logo} />
-			<div className={styles.card_number}>{cardNumber ? cardNumber : '0000000000000000'}</div>
-			<div className={styles.card_name}>{cardName ? cardName : 'Jane Doe'}</div>
+			<div className={styles.card_number}>{cardNumber ? cardNumber : '1234 5678 9123 0000'}</div>
+			<div className={styles.card_name}>{cardName ? cardName : 'Jane Appleseed'}</div>
 			<div className={styles.card_expiration}>
-				{cardExpMonth ? cardExpMonth : '00'}/{cardExpYear ? cardExpYear : '00'}
+				{cardExpMonth ? cardExpMonth : 'MM'}/{cardExpYear ? cardExpYear : 'YY'}
 			</div>
 		</div>
 	);
