@@ -1,8 +1,8 @@
 import { useCallback, useEffect, useRef, useState } from 'react';
-import { Form, Button, Col, InputGroup, Row } from 'react-bootstrap';
+import { Form, Button, Col, Row } from 'react-bootstrap';
 
 export function CreditCardForm({ onCreditFormChange, creditFormData }) {
-	const { cardName, cardNumber, cardCvc, cardExpMonth, cardExpYear, complete } = {
+	const { cardName, cardNumber, cardCvc, cardExpMonth, cardExpYear } = {
 		...creditFormData,
 	};
 	const [isValid, setIsValid] = useState({
@@ -30,10 +30,7 @@ export function CreditCardForm({ onCreditFormChange, creditFormData }) {
 			if (invalidError) invalidError.classList.remove('display-invalid');
 		}
 
-		if (
-			(isValid.cardExpMonth.isEmpty || isValid.cardExpYear.isEmpty) &&
-			(!isValid.cardExpMonth.isFormatted || !isValid.cardExpYear.isFormatted)
-		) {
+		if ((isValid.cardExpMonth.isEmpty || isValid.cardExpYear.isEmpty) && (!isValid.cardExpMonth.isFormatted || !isValid.cardExpYear.isFormatted)) {
 			if (invalidError) invalidError.classList.add('display-invalid-shift');
 		} else {
 			if (invalidError) invalidError.classList.remove('display-invalid-shift');
@@ -52,12 +49,13 @@ export function CreditCardForm({ onCreditFormChange, creditFormData }) {
 					for (const prop in fieldValue) {
 						if (fieldValue.hasOwnProperty(prop)) {
 							if (prop === 'isEmpty' && fieldValue[prop] === true) {
-								onCreditFormChange({ ...creditFormData, complete: false });
 								complete = false;
+								onCreditFormChange({ ...creditFormData, complete });
+								// complete = false;
 								break outerLoop;
 							} else if (prop === 'isFormatted' && fieldValue[prop] === false) {
-								onCreditFormChange({ ...creditFormData, complete: false });
 								complete = false;
+								onCreditFormChange({ ...creditFormData, complete });
 								break outerLoop;
 							}
 							// const propValue = fieldValue[prop];
@@ -67,7 +65,7 @@ export function CreditCardForm({ onCreditFormChange, creditFormData }) {
 				}
 			}
 		}
-		if (complete) onCreditFormChange({ ...creditFormData, complete: true });
+		if (complete) onCreditFormChange({ ...creditFormData, complete });
 	}, [isSubmitted]);
 
 	useEffect(() => {
@@ -235,22 +233,15 @@ export function CreditCardForm({ onCreditFormChange, creditFormData }) {
 						maxLength='19'
 						isInvalid={isValid.cardNumber.isEmpty || !isValid.cardNumber.isFormatted}
 					/>
-					{isValid.cardNumber.isEmpty && (
-						<Form.Control.Feedback type='invalid'>Card number can't be blank</Form.Control.Feedback>
-					)}
-					{!isValid.cardNumber.isFormatted && (
-						<Form.Control.Feedback type='invalid'>Card number is not valid</Form.Control.Feedback>
-					)}
+					{isValid.cardNumber.isEmpty && <Form.Control.Feedback type='invalid'>Card number can't be blank</Form.Control.Feedback>}
+					{!isValid.cardNumber.isFormatted && <Form.Control.Feedback type='invalid'>Card number is not valid</Form.Control.Feedback>}
 				</div>
 			</Form.Group>
 			<Row className='align-items-center mb-4'>
 				<fieldset className='my-1 col'>
 					<Form.Label htmlFor='cardExpMonth'>EXP. DATE (MM/YY)</Form.Label>
 					<Form.Group controlId='cardExpMonth' className='w-100 input-month'>
-						<Row
-							id='expiration-group'
-							className='align-items-center justify-content-around exp-row-wrapper'
-						>
+						<Row id='expiration-group' className='align-items-center justify-content-around exp-row-wrapper'>
 							<div className='custom-form-control-wrapper exp-wrapper'>
 								<Form.Control
 									// id='cardExpMonth'
@@ -299,16 +290,12 @@ export function CreditCardForm({ onCreditFormChange, creditFormData }) {
 							onChange={handleFormInputChange}
 							isInvalid={isValid.cardCvc.isEmpty || !isValid.cardCvc.isFormatted}
 						/>
-						{isValid.cardCvc.isEmpty && (
-							<Form.Control.Feedback type='invalid'>CVC can't be blank</Form.Control.Feedback>
-						)}
-						{!isValid.cardCvc.isFormatted && (
-							<Form.Control.Feedback type='invalid'>CVC is not valid</Form.Control.Feedback>
-						)}
+						{isValid.cardCvc.isEmpty && <Form.Control.Feedback type='invalid'>CVC can't be blank</Form.Control.Feedback>}
+						{!isValid.cardCvc.isFormatted && <Form.Control.Feedback type='invalid'>CVC is not valid</Form.Control.Feedback>}
 					</div>
 				</Col>
 			</Row>
-			<Button variant='primary w-100' type='submit'>
+			<Button variant='primary w-100 p-3' type='submit'>
 				Confirm
 			</Button>
 		</Form>
