@@ -15,6 +15,13 @@ function MainContainer() {
 		complete: false,
 	});
 
+	const [isFormComplete, setIsFormComplete] = useState(false);
+
+	const handleFormComplete = status => {
+		setIsFormComplete(status);
+		console.log(`isFormComplete: ${isFormComplete}`);
+	};
+
 	const handleCreditCardChange = newCreditData => {
 		setCreditFormData(newCreditData);
 		console.log(`newCreditData.complete: ${newCreditData.complete}`);
@@ -38,7 +45,12 @@ function MainContainer() {
 					/>
 				</div>
 			</div>
-			<CreditCardForm onCreditFormChange={handleCreditCardChange} creditFormData={creditFormData} />
+			<CreditCardForm
+				onCreditFormChange={handleCreditCardChange}
+				creditFormData={creditFormData}
+				onFormComplete={handleFormComplete}
+				isFormComplete={isFormComplete}
+			/>
 			{/* 0000 0000 0000 0000 Jane Appleseed 00/00 000 Cardholder Name e.g. Jane Appleseed Card Number
 			e.g. 1234 5678 9123 0000 Exp. Date (MM/YY) MM YY CVC e.g. 123 Confirm Thank you! We've added
 			your card details Continue */}

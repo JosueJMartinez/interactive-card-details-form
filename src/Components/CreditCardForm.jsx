@@ -1,7 +1,12 @@
 import { useCallback, useEffect, useRef, useState } from 'react';
 import { Form, Button, Col, InputGroup, Row } from 'react-bootstrap';
 
-export function CreditCardForm({ onCreditFormChange, creditFormData }) {
+export function CreditCardForm({
+	onCreditFormChange,
+	creditFormData,
+	onFormComplete,
+	isFormComplete,
+}) {
 	const { cardName, cardNumber, cardCvc, cardExpMonth, cardExpYear, complete } = {
 		...creditFormData,
 	};
@@ -52,11 +57,11 @@ export function CreditCardForm({ onCreditFormChange, creditFormData }) {
 					for (const prop in fieldValue) {
 						if (fieldValue.hasOwnProperty(prop)) {
 							if (prop === 'isEmpty' && fieldValue[prop] === true) {
-								onCreditFormChange({ ...creditFormData, complete: false });
+								onFormComplete(false);
 								complete = false;
 								break outerLoop;
 							} else if (prop === 'isFormatted' && fieldValue[prop] === false) {
-								onCreditFormChange({ ...creditFormData, complete: false });
+								onFormComplete(false);
 								complete = false;
 								break outerLoop;
 							}
@@ -67,8 +72,8 @@ export function CreditCardForm({ onCreditFormChange, creditFormData }) {
 				}
 			}
 		}
-		if (complete) onCreditFormChange({ ...creditFormData, complete: true });
-	}, [isSubmitted]);
+		if (complete) onFormComplete(true);
+	}, [onFormComplete, isValid]);
 
 	useEffect(() => {
 		checkValidationExpDate();
@@ -125,33 +130,6 @@ export function CreditCardForm({ onCreditFormChange, creditFormData }) {
 			formatCardNumber: true,
 			name: 'cardNumber',
 		});
-		/* 	let complete = true;
-		outerLoop: for (const fieldName in isValid) {
-			if (isValid.hasOwnProperty(fieldName)) {
-				const fieldValue = isValid[fieldName];
-				console.log(`${fieldName}: ${fieldValue}`);
-
-				// If fieldValue is an object, loop through its properties
-				if (typeof fieldValue === 'object') {
-					for (const prop in fieldValue) {
-						if (fieldValue.hasOwnProperty(prop)) {
-							if (prop === 'isEmpty' && fieldValue[prop] === true) {
-								onCreditFormChange({ ...creditFormData, complete: false });
-								complete = false;
-								break outerLoop;
-							} else if (prop === 'isFormatted' && fieldValue[prop] === false) {
-								onCreditFormChange({ ...creditFormData, complete: false });
-								complete = false;
-								break outerLoop;
-							}
-							if (complete) onCreditFormChange({ ...creditFormData, complete: true });
-							const propValue = fieldValue[prop];
-							// console.log(`  ${prop}: ${propValue}`);
-						}
-					}
-				}
-			}
-		} */
 	};
 
 	const genericValidate = (value, args) => {
