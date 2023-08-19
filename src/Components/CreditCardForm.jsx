@@ -1,8 +1,10 @@
-import { useCallback, useEffect, useState } from 'react';
+import { useCallback, useEffect, useRef, useState } from 'react';
 import { Form, Button, Col, InputGroup, Row } from 'react-bootstrap';
 
 export function CreditCardForm({ onCreditFormChange, creditFormData }) {
-	const { cardName, cardNumber, cardCvc, cardExpMonth, cardExpYear } = { ...creditFormData };
+	const { cardName, cardNumber, cardCvc, cardExpMonth, cardExpYear, complete } = {
+		...creditFormData,
+	};
 	const [isValid, setIsValid] = useState({
 		cardName: { isEmpty: false },
 		cardNumber: { isEmpty: false, isFormatted: true },
@@ -11,8 +13,9 @@ export function CreditCardForm({ onCreditFormChange, creditFormData }) {
 		cardExpYear: { isEmpty: false, isFormatted: true },
 	});
 	const [isSubmitted, setIsSubmitted] = useState(false);
+	const isInitialMount = useRef(true);
 
-	const checkValidation = useCallback(() => {
+	const checkValidationExpDate = useCallback(() => {
 		const blankError = document.querySelector('#expiration-group #blankId');
 		const invalidError = document.querySelector('#expiration-group #notValidId');
 		if (isValid.cardExpMonth.isEmpty || isValid.cardExpYear.isEmpty) {
@@ -37,9 +40,47 @@ export function CreditCardForm({ onCreditFormChange, creditFormData }) {
 		}
 	}, [isValid]);
 
+	const checkIfFormComplete = useCallback(() => {
+		let complete = true;
+		outerLoop: for (const fieldName in isValid) {
+			if (isValid.hasOwnProperty(fieldName)) {
+				const fieldValue = isValid[fieldName];
+				// console.log(`${fieldName}: ${fieldValue}`);
+
+				// If fieldValue is an object, loop through its properties
+				if (typeof fieldValue === 'object') {
+					for (const prop in fieldValue) {
+						if (fieldValue.hasOwnProperty(prop)) {
+							if (prop === 'isEmpty' && fieldValue[prop] === true) {
+								onCreditFormChange({ ...creditFormData, complete: false });
+								complete = false;
+								break outerLoop;
+							} else if (prop === 'isFormatted' && fieldValue[prop] === false) {
+								onCreditFormChange({ ...creditFormData, complete: false });
+								complete = false;
+								break outerLoop;
+							}
+							// const propValue = fieldValue[prop];
+							// console.log(`  ${prop}: ${propValue}`);
+						}
+					}
+				}
+			}
+		}
+		if (complete) onCreditFormChange({ ...creditFormData, complete: true });
+	}, [isSubmitted]);
+
 	useEffect(() => {
-		checkValidation();
-	}, [checkValidation, isSubmitted]);
+		checkValidationExpDate();
+	}, [checkValidationExpDate, isSubmitted]);
+	useEffect(() => {
+		if (isInitialMount.current) {
+			isInitialMount.current = false;
+		} else {
+			console.log('check to submit');
+			checkIfFormComplete();
+		}
+	}, [isSubmitted, checkIfFormComplete]);
 
 	const handleFormInputChange = e => {
 		let { name, value } = e.target;
@@ -84,6 +125,33 @@ export function CreditCardForm({ onCreditFormChange, creditFormData }) {
 			formatCardNumber: true,
 			name: 'cardNumber',
 		});
+		/* 	let complete = true;
+		outerLoop: for (const fieldName in isValid) {
+			if (isValid.hasOwnProperty(fieldName)) {
+				const fieldValue = isValid[fieldName];
+				console.log(`${fieldName}: ${fieldValue}`);
+
+				// If fieldValue is an object, loop through its properties
+				if (typeof fieldValue === 'object') {
+					for (const prop in fieldValue) {
+						if (fieldValue.hasOwnProperty(prop)) {
+							if (prop === 'isEmpty' && fieldValue[prop] === true) {
+								onCreditFormChange({ ...creditFormData, complete: false });
+								complete = false;
+								break outerLoop;
+							} else if (prop === 'isFormatted' && fieldValue[prop] === false) {
+								onCreditFormChange({ ...creditFormData, complete: false });
+								complete = false;
+								break outerLoop;
+							}
+							if (complete) onCreditFormChange({ ...creditFormData, complete: true });
+							const propValue = fieldValue[prop];
+							// console.log(`  ${prop}: ${propValue}`);
+						}
+					}
+				}
+			}
+		} */
 	};
 
 	const genericValidate = (value, args) => {
@@ -185,7 +253,7 @@ export function CreditCardForm({ onCreditFormChange, creditFormData }) {
 						>
 							<div className='custom-form-control-wrapper exp-wrapper'>
 								<Form.Control
-									id='cardExpMonth'
+									// id='cardExpMonth'
 									type='text'
 									placeholder='MM'
 									name='cardExpMonth'
@@ -196,7 +264,7 @@ export function CreditCardForm({ onCreditFormChange, creditFormData }) {
 							</div>
 							<div className='custom-form-control-wrapper exp-wrapper'>
 								<Form.Control
-									id='cardExpYear'
+									// id='cardExpYear'
 									type='text'
 									placeholder='YY'
 									name='cardExpYear'
@@ -222,7 +290,7 @@ export function CreditCardForm({ onCreditFormChange, creditFormData }) {
 					<Form.Label htmlFor='cardCvc'>CVC</Form.Label>
 					<div className='custom-form-control-wrapper'>
 						<Form.Control
-							id='cardCvc'
+							// id='cardCvc'
 							type='text'
 							placeholder='e.g. 123'
 							maxLength='3'

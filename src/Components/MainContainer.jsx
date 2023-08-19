@@ -12,10 +12,12 @@ function MainContainer() {
 		cardCvc: '',
 		cardExpMonth: '',
 		cardExpYear: '',
+		complete: false,
 	});
 
 	const handleCreditCardChange = newCreditData => {
 		setCreditFormData(newCreditData);
+		console.log(`newCreditData.complete: ${newCreditData.complete}`);
 	};
 
 	return (
