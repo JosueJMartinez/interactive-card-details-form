@@ -3,7 +3,14 @@ import SVG from '../images/icon-complete.svg';
 
 export function CompleteNotification({ onCompleteChange, creditFormData }) {
 	const handleButtonClick = evt => {
-		onCompleteChange({ ...creditFormData, complete: false });
+		onCompleteChange({
+			cardName: '',
+			cardNumber: '',
+			cardCvc: '',
+			cardExpMonth: '',
+			cardExpYear: '',
+			complete: false,
+		});
 	};
 	return (
 		<div className='w-100 mt-5'>
