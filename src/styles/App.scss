@@ -9,8 +9,6 @@ $btn-primary-bg: #ff0000;
 
 // Default variable overrides
 
-// $body-bg: hsl(229, 57%, 11%);
-
 $light: white;
 
 // // Optional Bootstrap components here
@@ -46,18 +44,14 @@ $light: white;
 }
 
 body {
-	// font-family: 'Roboto', sans-serif;
 	height: 100vh;
-	// background-image: url('../images/bg-main-mobile.png');
 	background-repeat: no-repeat;
-	// background-size: cover;
 }
 
 // form overwrites
 
 .custom-form-control-wrapper {
 	position: relative; /* For positioning the pseudo-element */
-	// margin-bottom: 10px;
 	&::after {
 		content: '';
 		position: absolute;
@@ -124,4 +118,12 @@ body {
 }
 .card {
 	border: none;
+}
+
+@media (min-width: 1200px) {
+	#complete-notification,
+	#main-form {
+		position: absolute;
+		width: 500px !important;
+	}
 }

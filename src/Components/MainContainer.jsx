@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect, useRef } from 'react';
 
 import { BackCreditCard } from './BackCreditCard';
 import { FrontCreditCard } from './FrontCreditCard';
@@ -16,13 +16,42 @@ function MainContainer() {
 		complete: false,
 	});
 
+	const [mainFormStyle, setMainFormStyle] = useState({});
+
+	const isInitialMount = useRef(true);
+
+	useEffect(() => {
+		const handleWindowResize = () => {
+			if (window.innerWidth < 1200) {
+				setMainFormStyle({});
+			} else if (window.innerWidth < 1340) {
+				setMainFormStyle({
+					right: `${window.innerWidth - 1190}px`,
+				});
+			} else {
+				setMainFormStyle({
+					right: `${(window.innerWidth - 983) / 2}px`,
+				});
+			}
+		};
+
+		if (isInitialMount.current) {
+			handleWindowResize();
+		}
+		window.addEventListener('resize', handleWindowResize);
+		return () => {
+			window.removeEventListener('resize', handleWindowResize);
+		};
+	}, []);
+
 	const handleCreditCardChange = newCreditData => {
 		setCreditFormData(newCreditData);
-		console.log(`newCreditData.complete: ${newCreditData.complete}`);
 	};
 
 	return (
-		<div className={`container-fluid container-sm d-flex flex-column align-items-center justify-content-center vh-100 ${styles.mobile_background}`}>
+		<div
+			className={`container-fluid container-sm d-flex flex-column align-items-center justify-content-center vh-100 ${styles.mobile_background}`}
+		>
 			{' '}
 			<div className={styles.background_container}>
 				<div className={styles.card_holder}>
@@ -37,11 +66,20 @@ function MainContainer() {
 					/>
 				</div>
 			</div>
-			{!creditFormData.complete && <CreditCardForm onCreditFormChange={handleCreditCardChange} creditFormData={creditFormData} />}
-			{creditFormData.complete && <CompleteNotification onCompleteChange={setCreditFormData} creditFormData={creditFormData}></CompleteNotification>}
-			{/* 0000 0000 0000 0000 Jane Appleseed 00/00 000 Cardholder Name e.g. Jane Appleseed Card Number
-			e.g. 1234 5678 9123 0000 Exp. Date (MM/YY) MM YY CVC e.g. 123 Confirm Thank you! We've added
-			your card details Continue */}
+			{!creditFormData.complete && (
+				<CreditCardForm
+					onCreditFormChange={handleCreditCardChange}
+					creditFormData={creditFormData}
+					mainFormStyle={mainFormStyle}
+				/>
+			)}
+			{creditFormData.complete && (
+				<CompleteNotification
+					onCompleteChange={setCreditFormData}
+					creditFormData={creditFormData}
+					mainFormStyle={mainFormStyle}
+				></CompleteNotification>
+			)}
 		</div>
 	);
 }

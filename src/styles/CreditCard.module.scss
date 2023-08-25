@@ -52,3 +52,16 @@
 		}
 	}
 }
+
+@media (min-width: 1200px) {
+	.credit_card {
+		&_back {
+			top: 10px;
+			left: 100px;
+		}
+		&_front {
+			top: -150px;
+			left: 40px;
+		}
+	}
+}

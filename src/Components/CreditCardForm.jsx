@@ -1,7 +1,7 @@
 import { useCallback, useEffect, useRef, useState } from 'react';
 import { Form, Button, Col, Row } from 'react-bootstrap';
 
-export function CreditCardForm({ onCreditFormChange, creditFormData }) {
+export function CreditCardForm({ onCreditFormChange, creditFormData, mainFormStyle }) {
 	const { cardName, cardNumber, cardCvc, cardExpMonth, cardExpYear } = {
 		...creditFormData,
 	};
@@ -30,7 +30,10 @@ export function CreditCardForm({ onCreditFormChange, creditFormData }) {
 			if (invalidError) invalidError.classList.remove('display-invalid');
 		}
 
-		if ((isValid.cardExpMonth.isEmpty || isValid.cardExpYear.isEmpty) && (!isValid.cardExpMonth.isFormatted || !isValid.cardExpYear.isFormatted)) {
+		if (
+			(isValid.cardExpMonth.isEmpty || isValid.cardExpYear.isEmpty) &&
+			(!isValid.cardExpMonth.isFormatted || !isValid.cardExpYear.isFormatted)
+		) {
 			if (invalidError) invalidError.classList.add('display-invalid-shift');
 		} else {
 			if (invalidError) invalidError.classList.remove('display-invalid-shift');
@@ -42,24 +45,19 @@ export function CreditCardForm({ onCreditFormChange, creditFormData }) {
 		outerLoop: for (const fieldName in isValid) {
 			if (isValid.hasOwnProperty(fieldName)) {
 				const fieldValue = isValid[fieldName];
-				// console.log(`${fieldName}: ${fieldValue}`);
 
-				// If fieldValue is an object, loop through its properties
 				if (typeof fieldValue === 'object') {
 					for (const prop in fieldValue) {
 						if (fieldValue.hasOwnProperty(prop)) {
 							if (prop === 'isEmpty' && fieldValue[prop] === true) {
 								complete = false;
 								onCreditFormChange({ ...creditFormData, complete });
-								// complete = false;
 								break outerLoop;
 							} else if (prop === 'isFormatted' && fieldValue[prop] === false) {
 								complete = false;
 								onCreditFormChange({ ...creditFormData, complete });
 								break outerLoop;
 							}
-							// const propValue = fieldValue[prop];
-							// console.log(`  ${prop}: ${propValue}`);
 						}
 					}
 				}
@@ -71,11 +69,11 @@ export function CreditCardForm({ onCreditFormChange, creditFormData }) {
 	useEffect(() => {
 		checkValidationExpDate();
 	}, [checkValidationExpDate, isSubmitted]);
+
 	useEffect(() => {
 		if (isInitialMount.current) {
 			isInitialMount.current = false;
 		} else {
-			console.log('check to submit');
 			checkIfFormComplete();
 		}
 	}, [isSubmitted, checkIfFormComplete]);
@@ -123,33 +121,6 @@ export function CreditCardForm({ onCreditFormChange, creditFormData }) {
 			formatCardNumber: true,
 			name: 'cardNumber',
 		});
-		/* 	let complete = true;
-		outerLoop: for (const fieldName in isValid) {
-			if (isValid.hasOwnProperty(fieldName)) {
-				const fieldValue = isValid[fieldName];
-				console.log(`${fieldName}: ${fieldValue}`);
-
-				// If fieldValue is an object, loop through its properties
-				if (typeof fieldValue === 'object') {
-					for (const prop in fieldValue) {
-						if (fieldValue.hasOwnProperty(prop)) {
-							if (prop === 'isEmpty' && fieldValue[prop] === true) {
-								onCreditFormChange({ ...creditFormData, complete: false });
-								complete = false;
-								break outerLoop;
-							} else if (prop === 'isFormatted' && fieldValue[prop] === false) {
-								onCreditFormChange({ ...creditFormData, complete: false });
-								complete = false;
-								break outerLoop;
-							}
-							if (complete) onCreditFormChange({ ...creditFormData, complete: true });
-							const propValue = fieldValue[prop];
-							// console.log(`  ${prop}: ${propValue}`);
-						}
-					}
-				}
-			}
-		} */
 	};
 
 	const genericValidate = (value, args) => {
@@ -206,7 +177,7 @@ export function CreditCardForm({ onCreditFormChange, creditFormData }) {
 	};
 
 	return (
-		<Form className='w-100 mt-5' onSubmit={handleSubmit}>
+		<Form id='main-form' className='w-100 mt-5' onSubmit={handleSubmit} style={mainFormStyle}>
 			<Form.Group className='mb-4' controlId='cardName'>
 				<Form.Label>CARDHOLDER NAME</Form.Label>
 				<div className='custom-form-control-wrapper'>
@@ -233,18 +204,24 @@ export function CreditCardForm({ onCreditFormChange, creditFormData }) {
 						maxLength='19'
 						isInvalid={isValid.cardNumber.isEmpty || !isValid.cardNumber.isFormatted}
 					/>
-					{isValid.cardNumber.isEmpty && <Form.Control.Feedback type='invalid'>Card number can't be blank</Form.Control.Feedback>}
-					{!isValid.cardNumber.isFormatted && <Form.Control.Feedback type='invalid'>Card number is not valid</Form.Control.Feedback>}
+					{isValid.cardNumber.isEmpty && (
+						<Form.Control.Feedback type='invalid'>Card number can't be blank</Form.Control.Feedback>
+					)}
+					{!isValid.cardNumber.isFormatted && (
+						<Form.Control.Feedback type='invalid'>Card number is not valid</Form.Control.Feedback>
+					)}
 				</div>
 			</Form.Group>
 			<Row className='align-items-center mb-4'>
 				<fieldset className='my-1 col'>
 					<Form.Label htmlFor='cardExpMonth'>EXP. DATE (MM/YY)</Form.Label>
 					<Form.Group controlId='cardExpMonth' className='w-100 input-month'>
-						<Row id='expiration-group' className='align-items-center justify-content-around exp-row-wrapper'>
+						<Row
+							id='expiration-group'
+							className='align-items-center justify-content-around exp-row-wrapper'
+						>
 							<div className='custom-form-control-wrapper exp-wrapper'>
 								<Form.Control
-									// id='cardExpMonth'
 									type='text'
 									placeholder='MM'
 									name='cardExpMonth'
@@ -255,7 +232,6 @@ export function CreditCardForm({ onCreditFormChange, creditFormData }) {
 							</div>
 							<div className='custom-form-control-wrapper exp-wrapper'>
 								<Form.Control
-									// id='cardExpYear'
 									type='text'
 									placeholder='YY'
 									name='cardExpYear'
@@ -281,7 +257,6 @@ export function CreditCardForm({ onCreditFormChange, creditFormData }) {
 					<Form.Label htmlFor='cardCvc'>CVC</Form.Label>
 					<div className='custom-form-control-wrapper'>
 						<Form.Control
-							// id='cardCvc'
 							type='text'
 							placeholder='e.g. 123'
 							maxLength='3'
@@ -290,8 +265,12 @@ export function CreditCardForm({ onCreditFormChange, creditFormData }) {
 							onChange={handleFormInputChange}
 							isInvalid={isValid.cardCvc.isEmpty || !isValid.cardCvc.isFormatted}
 						/>
-						{isValid.cardCvc.isEmpty && <Form.Control.Feedback type='invalid'>CVC can't be blank</Form.Control.Feedback>}
-						{!isValid.cardCvc.isFormatted && <Form.Control.Feedback type='invalid'>CVC is not valid</Form.Control.Feedback>}
+						{isValid.cardCvc.isEmpty && (
+							<Form.Control.Feedback type='invalid'>CVC can't be blank</Form.Control.Feedback>
+						)}
+						{!isValid.cardCvc.isFormatted && (
+							<Form.Control.Feedback type='invalid'>CVC is not valid</Form.Control.Feedback>
+						)}
 					</div>
 				</Col>
 			</Row>
